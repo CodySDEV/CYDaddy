@@ -82,7 +82,9 @@ Order that worked: speaker first (plug it into `SPEAK` last, when the case is al
 
 ![Case, back](../images/03_case_back.png)
 
-## Step 7: the stylus and knob
+## Step 7: the stylus and knob (not final)
+
+> None of the three stylus bodies fit in our test prints, so this step is on hold until the redesign. The case works fine without it.
 
 ![Stylus parts](../images/18_stylus_body_and_knob.png)
 

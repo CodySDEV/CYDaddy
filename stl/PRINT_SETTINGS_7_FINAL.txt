@@ -12,7 +12,7 @@ FILES
   CYDaddy_7_07A_stylus_body_dia3.82.stl         stylus body, +1.0 mm around vs the old slim one
   CYDaddy_7_07B_stylus_body_dia3.88.stl         stylus body, +1.2 mm  (start here)
   CYDaddy_7_07C_stylus_body_dia3.98.stl         stylus body, +1.5 mm
-  Print the stylus body that slides in snugly and still clicks. One is enough once you know. (3.5 mm was too skinny.)
+  STYLUS NOT FINAL: A, B and C all failed to fit when test-printed. Redesign pending. Skip the stylus for now.
 
 PLATE 1 - CASE PARTS
   Layer height 0.16, first layer 0.2
