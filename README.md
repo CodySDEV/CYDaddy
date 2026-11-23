@@ -7,9 +7,10 @@ A 3D-printed handheld case for the **CYD (Cheap Yellow Display), board model ESP
 
 **Main board:** ESP32-2432S028 CYD, 2.8" 320x240 ILI9341, XPT2046 resistive touch, USB-C, PCB 85.9 x 50.2 mm. Case: 110.6 x 71.2 x 25.5 mm.
 
-## Look at it in 3D
 
-Open [`viewer/index.html`](viewer/index.html) through a web server (GitHub Pages works: Settings, Pages, deploy from the main branch, then open `/viewer/`). Opening the file directly from disk will not load the models. Use the "Pull apart" slider to see every layer.
+## [Look at it in 3D](https://codysdev.github.io/CYDaddy/viewer/)
+
+Click the link above, then use the **Pull apart** slider to see every layer.
 
 ![Exploded](images/10_exploded_angled.png)
 
