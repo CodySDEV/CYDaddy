@@ -1,0 +1,57 @@
+CYDADDY ENCLOSURE 7 FINAL - PRINT SETTINGS
+Every STL in this folder is already turned the right way to print. Do not rotate anything.
+Printer used: FlashForge Adventurer 5M Pro (Flash Studio). Filament: Overture PLA Professional (PLA+), custom filament profile.
+
+FILES
+  CYDaddy_7_01_front_shell_TOP.stl              1x   front shell (screen side)
+  CYDaddy_7_02_back_shell_BOTTOM.stl            1x   back shell, already flipped (flat back wall on the bed)
+  CYDaddy_7_03_battery_strap.stl                1x
+  CYDaddy_7_04_booster_strap.stl                1x
+  CYDaddy_7_05_charger_tabs_x4_REINFORCED.stl   print the plate of 4, use 2, keep 2 spare
+  CYDaddy_7_06_stylus_knob.stl                  1x   stands up, face that goes against the case on the bed
+  CYDaddy_7_07A_stylus_body_dia3.82.stl         stylus body, +1.0 mm around vs the old slim one
+  CYDaddy_7_07B_stylus_body_dia3.88.stl         stylus body, +1.2 mm  (start here)
+  CYDaddy_7_07C_stylus_body_dia3.98.stl         stylus body, +1.5 mm
+  Print the stylus body that slides in snugly and still clicks. One is enough once you know. (3.5 mm was too skinny.)
+
+PLATE 1 - CASE PARTS
+  Layer height 0.16, first layer 0.2
+  Wall loops 4, top shell layers 5, bottom shell layers 5
+  Sparse infill 20%   (charger tabs: 100% infill, 4 walls, they carry a screw)
+  Outer wall speed 40 mm/s
+  Seam position: Back
+  Supports off, brim off  (if a corner lifts, brim outer only 6 mm worked on the fit jig)
+  Nozzle 220 first layer, 215 after
+  Textured PEI bed 60 first layer, 55 after
+  Retraction: default (0.8 mm length if you need a number), wipe while retracting on
+  Dry the filament if you can (the first top shell strung badly). Clean the plate with isopropyl.
+
+PLATE 2 - STYLUS (glue stick on the plate)
+  Stylus body lies flat, knob stands, as loaded.
+  Layer height 0.12, first layer 0.2
+  Wall loops 4, top and bottom layers 5
+  Infill 100%
+  Outer wall speed 30 mm/s
+  Seam position: Back
+  Supports off, brim off
+  Nozzle 220 first layer, 215 after
+  Bed 60 first layer, 55 after
+
+AFTER PRINTING
+  - Clear the four M3 holes in the back shell with a 3.5 mm drill or a spare screw (strings close them).
+  - Heat-set the four M3 x 5.7 brass inserts into the front shell corner posts (pockets are 4.3 mm). Iron at the lowest dial setting (200 on our LDK 60 W), slow, light pressure, until nearly flush, then press flush and let cool.
+  - Stylus: slide the flange on the end of the body into the side slot of the knob until the thin neck sits in the narrow slit. The lip inside the knob sits behind the flange, so pulling the knob pulls the stylus. Put a drop of CA glue in the slot so it cannot slide back out.
+
+WHICH SCREW GOES WHERE
+  CYD to front shell        4x  M3 x 5
+  Case closing (from back)  4x  M3 x 12 (or x 16 if it does not bottom out)
+  Battery strap             2x  M2.5 x 8
+  Booster strap             2x  M2.5 x 8
+  Charger tabs              2x  M2.5 x 8
+  Speaker ears              2x  M2.5 x 6
+  Power switch ears         2x  M2 x 4  (NOT longer: the wall is only 4.4 mm; cut an M2 x 6 down to 4)
+
+WHAT CHANGED IN 7 FINAL (vs 6.6)
+  - Charger tabs reinforced: 7.4 wide with a round 3.7 mm end behind the screw hole (were 6.0 x 8.4 and snapping). Ring around the hole 2.35 mm each side (was 1.65).
+  - Stylus: three thicker bodies (3.82, 3.88, 3.98 mm) to replace the 3.5 mm one, flange nudged down 0.1 mm so it touches the bed.
+  - Front shell, back shell, straps and knob are the printed and verified v6.6 parts: speaker posts and switch screw holes were tested and are perfect.

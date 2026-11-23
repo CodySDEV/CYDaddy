@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CYDaddy Enclosure 7 Final - 3D viewer</title>
+<style>
+  html,body{margin:0;background:#f4f3ee;color:#2c2c2a;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+  #wrap{max-width:1000px;margin:0 auto;padding:8px}
+  #cv{width:100%;height:60vh;min-height:340px;display:block;background:#e9e7df;border-radius:12px;touch-action:none}
+  .row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  button{font:inherit;font-size:15px;padding:8px 12px;border-radius:8px;border:1px solid #b4b2a9;background:#fff;color:#2c2c2a;cursor:pointer}
+  button.on{background:#2c2c2a;color:#fff;border-color:#2c2c2a}
+  label{font-size:15px;display:flex;align-items:center;gap:6px;padding:4px 6px}
+  input[type=range]{flex:1;min-width:140px}
+  h1{font-size:19px;font-weight:600;margin:6px 4px}
+  #msg{font-size:14px;color:#5f5e5a;margin:4px}
+  #sw{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;margin:4px}
+  #sw span i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .sl{display:flex;align-items:center;gap:10px;padding:0 4px;margin:4px 0}
+  .sl span{min-width:110px;font-size:15px}
+  small{color:#5f5e5a}
+</style>
+</head>
+<body>
+<div id="wrap">
+<h1>CYDaddy Enclosure 7 Final</h1>
+<canvas id="cv"></canvas>
+<div id="msg">Loading model...</div>
+<div class="row" id="show">
+  <button data-s="all" class="on">Whole case</button>
+  <button data-s="top">Front shell</button>
+  <button data-s="bottom">Back shell</button>
+  <button data-s="small">Straps and tabs</button>
+</div>
+<div class="row">
+  <label><input type="checkbox" id="cComp" checked> Electronics inside</label>
+  <label><input type="checkbox" id="cSty" checked> Stylus and knob</label>
+  <label><input type="checkbox" id="cTab" checked> Straps and tabs</label>
+</div>
+<div class="row" id="views">
+  <button data-v="front">Front</button>
+  <button data-v="back">Back</button>
+  <button data-v="left">Lanyard end</button>
+  <button data-v="right">USB end</button>
+  <button data-v="top">Top edge (switch, stylus)</button>
+  <button data-v="bottom">Bottom edge</button>
+  <button data-v="iso">Angled</button>
+</div>
+<div class="sl"><span>Pull apart</span><input type="range" id="exp" min="0" max="70" value="0"></div>
+<div class="sl"><span>Pull stylus out</span><input type="range" id="sty" min="0" max="80" value="0"></div>
+<div id="sw"></div>
+<div style="font-size:13px;color:#5f5e5a;margin:6px 4px">Drag to turn, pinch or scroll to zoom. Slide <b>Pull apart</b> to see every layer: front shell with the CYD, straps and tabs, the electronics, the back shell. This viewer uses lighter meshes than the print files. Case size 110.6 x 71.2 x 25.5 mm.</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var msg=document.getElementById('msg');
+function fail(e){msg.textContent='Could not load: '+e+' (open this page from a web server or GitHub Pages, not by double-clicking the file)';}
+if(!window.THREE){fail('3D library blocked');return;}
+var L=110.6,W=71.2,ZS=11.6,ZT=25.5,YC=67.6,ZC=11.6;
+var cv=document.getElementById('cv');
+var renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+var scene=new THREE.Scene();scene.background=new THREE.Color(0xe9e7df);
+var cam=new THREE.PerspectiveCamera(35,1,1,1000);
+scene.add(new THREE.HemisphereLight(0xffffff,0x888888,0.75));
+var dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(-60,120,160);scene.add(dl);
+var dl2=new THREE.DirectionalLight(0xffffff,0.35);dl2.position.set(80,-60,-120);scene.add(dl2);
+var target=new THREE.Vector3(L/2,W/2,-ZT/2);
+var az=-0.45,el=0.35,dist=200,dirty=true;
+function setCam(){
+  cam.position.set(target.x+dist*Math.cos(el)*Math.sin(az),target.y+dist*Math.sin(el),target.z+dist*Math.cos(el)*Math.cos(az));
+  cam.up.set(0,1,0);cam.lookAt(target);dirty=true;
+}
+function resize(){var w=cv.clientWidth,h=cv.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=true;}
+window.addEventListener('resize',resize);
+var pts={},pd=0;
+cv.addEventListener('pointerdown',function(e){cv.setPointerCapture(e.pointerId);pts[e.pointerId]={x:e.clientX,y:e.clientY};});
+cv.addEventListener('pointerup',function(e){delete pts[e.pointerId];pd=0;});
+cv.addEventListener('pointercancel',function(e){delete pts[e.pointerId];pd=0;});
+cv.addEventListener('pointermove',function(e){
+  var p=pts[e.pointerId];if(!p)return;
+  var ids=Object.keys(pts);
+  if(ids.length===1){az-=(e.clientX-p.x)*0.008;el+=(e.clientY-p.y)*0.008;el=Math.max(-1.5,Math.min(1.5,el));}
+  p.x=e.clientX;p.y=e.clientY;
+  if(ids.length===2){
+    var a=pts[ids[0]],b=pts[ids[1]];var d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(pd){dist*=pd/d;dist=Math.max(60,Math.min(450,dist));}
+    pd=d;
+  }
+  setCam();
+});
+cv.addEventListener('wheel',function(e){e.preventDefault();dist*=(1+e.deltaY*0.001);dist=Math.max(60,Math.min(450,dist));setCam();},{passive:false});
+
+function geoFrom(buf,m,xf){
+  var nv=m.nv,nf=m.nf,pb=nv*6,off=pb+(pb%4?2:0);
+  var q=new Uint16Array(buf,0,nv*3),idx=new Uint32Array(buf,off,nf*3);
+  var pos=new Float32Array(nv*3);
+  for(var i=0;i<nv;i++){
+    var x=m.lo[0]+q[i*3]/65535*m.sc[0],y=m.lo[1]+q[i*3+1]/65535*m.sc[1],z=m.lo[2]+q[i*3+2]/65535*m.sc[2];
+    var r=xf?xf(x,y,z):[x,y,z];
+    pos[i*3]=r[0];pos[i*3+1]=r[1];pos[i*3+2]=-r[2];
+  }
+  var g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  g.setIndex(new THREE.BufferAttribute(idx,1));
+  g.computeVertexNormals();
+  return g;
+}
+function mat(c,o){return new THREE.MeshStandardMaterial({color:c,flatShading:true,side:THREE.DoubleSide,metalness:0.05,roughness:0.75,transparent:o!==undefined,opacity:o===undefined?1:o});}
+var G={top:new THREE.Group(),bottom:new THREE.Group(),small:new THREE.Group(),sty:new THREE.Group(),
+  cydc:new THREE.Group(),backc:new THREE.Group(),tabs:new THREE.Group()};
+// layers that move when pulled apart: front (top shell, CYD, stylus) stays; straps/tabs 0.3; parts 0.55; back shell 1.0
+scene.add(G.top);scene.add(G.cydc);scene.add(G.sty);scene.add(G.small);scene.add(G.tabs);scene.add(G.backc);scene.add(G.bottom);
+var sw=[['Front shell','#8d97a8'],['Back shell','#7b8aa6'],['Straps and tabs','#d4a13a'],['Stylus','#e8852b'],['Knob','#c9631c'],['CYD board','#2f7d4f'],['Boost (MT3608)','#2d6fbf'],['Charger (TP4056)','#8a4fbf'],['Battery','#c9a227'],['Speaker','#555555'],['Switch','#c0c0c0']];
+document.getElementById('sw').innerHTML=sw.map(function(s){return '<span><i style="background:'+s[1]+'"></i>'+s[0]+'</span>';}).join('');
+
+function box(g,x0,x1,y0,y1,z0,z1,c,o){
+  var m=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,z1-z0),mat(c,o));
+  m.position.set((x0+x1)/2,(y0+y1)/2,-(z0+z1)/2);g.add(m);
+}
+function addComps(){
+  // CYD glass and PCB stay with the front shell
+  box(G.cydc,31.5,100.5,8,58,2,6,0x1d1d1d,1);
+  box(G.cydc,22.5,108.4,7.9,58.1,6,7.6,0x2f7d4f,1);
+  box(G.cydc,108.4,110.0,23.5,33,6,9.6,0xb8b8b8,1);   // USB-C connector on the CYD (back face of the PCB)
+  // parts that sit in the back shell
+  box(G.backc,40.5,77.8,46.2,63.5,15.7,23.2,0x2d6fbf,1);     // boost
+  box(G.backc,2.6,20.6,44.5,56.6,18.5,22.5,0x8a4fbf,1);      // charger
+  box(G.backc,33.4,98.8,8.5,44.5,13.8,23.5,0xc9a227,1);      // battery
+  box(G.backc,3.55,30.55,13.45,40.45,13.5,23.5,0x555555,1);  // speaker 27 x 27 x 10
+  box(G.backc,92-5.25,92+5.25,61.8,66.8,14.6,20.5,0xc0c0c0,1);   // switch body
+  box(G.backc,92-9.8,92+9.8,66.4,66.8,14.6,20.5,0xc0c0c0,1);     // switch ears
+}
+function load(name){return fetch(name+'.bin').then(function(r){if(!r.ok)throw new Error(name);return r.arrayBuffer();});}
+fetch('parts.json').then(function(r){return r.json();}).then(function(meta){
+  var M={};meta.forEach(function(m){M[m.name]=m;});
+  return Promise.all(meta.map(function(m){return load(m.name);})).then(function(bufs){
+    var B={};meta.forEach(function(m,i){B[m.name]=bufs[i];});
+    G.top.add(new THREE.Mesh(geoFrom(B.top,M.top),mat(0x8d97a8)));
+    G.bottom.add(new THREE.Mesh(geoFrom(B.bottom,M.bottom),mat(0x7b8aa6)));
+    function strap(name,p0,p1,w,zr,t,col){
+      var dx=p1[0]-p0[0],dy=p1[1]-p0[1],th=Math.atan2(dy,dx),c=Math.cos(th),s=Math.sin(th);
+      G.small.add(new THREE.Mesh(geoFrom(B[name],M[name],function(x,y,z){var lx=x-w/2,ly=y-w/2;return [p0[0]+lx*c-ly*s,p0[1]+lx*s+ly*c,zr-t+z];}),mat(col)));
+    }
+    strap('bar',[45,5.2],[93.5,49],6,13.7,1.7,0xd4a13a);
+    strap('bstrap',[37.9,58.5],[80.4,58.5],10,16.55,1.5,0xe0b84f);
+    var tabs=[[11.6,59.2,0,-1,18.2],[23.2,50.55,-1,0,18.2]];
+    tabs.forEach(function(t){
+      var px=t[0],py=t[1],dx=t[2],dy=t[3],zp=t[4];
+      var th=Math.atan2(-dx,dy);var c=Math.cos(th),s=Math.sin(th);
+      G.tabs.add(new THREE.Mesh(geoFrom(B.tab,M.tab,function(x,y,z){
+        var lx=x-3.7,ly=y-3.7;return [px+lx*c-ly*s,py+lx*s+ly*c,zp-1.5+z];}),mat(0xd4a13a)));
+    });
+    G.sty.add(new THREE.Mesh(geoFrom(B.stylus,M.stylus,function(x,y,z){return [x,YC+y,ZC+z];}),mat(0xe8852b)));
+    G.sty.add(new THREE.Mesh(geoFrom(B.knob,M.knob,function(x,y,z){return [-z,YC+y,ZC+x];}),mat(0xc9631c)));
+    addComps();
+    msg.textContent='';
+    resize();setCam();setShow('all');setExp();
+  });
+}).catch(fail);
+
+var showMode='all';
+function setShow(m){
+  showMode=m;
+  var all=(m==='all');
+  G.top.visible=(all||m==='top');
+  G.bottom.visible=(all||m==='bottom');
+  G.cydc.visible=(all||m==='top')&&document.getElementById('cComp').checked;
+  G.backc.visible=all&&document.getElementById('cComp').checked;
+  G.sty.visible=(all||m==='top')&&document.getElementById('cSty').checked;
+  var s=(all&&document.getElementById('cTab').checked)||m==='small';
+  G.small.visible=s;G.tabs.visible=s;
+  Array.prototype.forEach.call(document.querySelectorAll('#show button'),function(b){b.className=b.getAttribute('data-s')===m?'on':'';});
+  dirty=true;
+}
+Array.prototype.forEach.call(document.querySelectorAll('#show button'),function(b){b.onclick=function(){setShow(b.getAttribute('data-s'));};});
+['cComp','cSty','cTab'].forEach(function(id){document.getElementById(id).onchange=function(){setShow(showMode);};});
+var VIEWS={front:[0,0],back:[Math.PI,0],left:[-Math.PI/2,0],right:[Math.PI/2,0],top:[0,1.45],bottom:[0,-1.45],iso:[-0.45,0.35]};
+Array.prototype.forEach.call(document.querySelectorAll('#views button'),function(b){b.onclick=function(){var v=VIEWS[b.getAttribute('data-v')];az=v[0];el=v[1];setCam();};});
+function setExp(){
+  var d=parseFloat(document.getElementById('exp').value);
+  G.small.position.z=-d*0.3;G.tabs.position.z=-d*0.3;
+  G.backc.position.z=-d*0.55;G.bottom.position.z=-d;
+  var s=parseFloat(document.getElementById('sty').value);
+  G.sty.position.x=-s;
+  target.z=-ZT/2-d*0.5;setCam();
+}
+document.getElementById('exp').oninput=setExp;
+document.getElementById('sty').oninput=setExp;
+function loop(){requestAnimationFrame(loop);if(dirty){dirty=false;renderer.render(scene,cam);}}
+resize();setCam();loop();
+})();
+</script>
+</body>
+</html>
